@@ -27,7 +27,7 @@ phases:
       - printf '[{"name":"comolu","imageUri":"%s"}]'
       #  cat to imagedefinitions.json
       #  $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-        $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - cat imagedefinitions.json
 artifacts:
   files: imagedefinitions.json
