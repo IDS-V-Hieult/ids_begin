@@ -13,10 +13,9 @@ Lý do chọn mô hình DistilBERT:
 ### 1.1 Dataset và Công cụ
 
 - **Dataset**: News aggregator dataset từ UCI Machine Learning Repository
+https://archive.ics.uci.edu/dataset/359/news+aggregator
 - **Model**: DistilBERT - một phiên bản nhỏ gọn của BERT
 - **Framework**: PyTorch và Transformers
-
-[THÊM ẢNH: Sơ đồ tổng quan về quy trình fine-tuning]
 
 ## 2. Thiết lập Môi trường
 
@@ -78,7 +77,6 @@ def encode_cat(x):
 df['ENCODE_CAT'] = df['CATEGORY'].apply(lambda x: encode_cat(x))
 ```
 
-[THÊM ẢNH: Sample của DataFrame đã xử lý]
 
 ### 3.2 Custom Dataset Class
 
@@ -173,7 +171,6 @@ model = DistillBERTClass()
 model.to(device)
 ```
 
-[THÊM ẢNH: Kiến trúc của model]
 
 ### 4.2 Loss Function và Optimizer
 
@@ -229,7 +226,6 @@ def train(epoch):
     print(f"Training Accuracy Epoch: {epoch_accu}")
 ```
 
-[THÊM ẢNH: Training progress với loss và accuracy]
 
 ### 5.2 Validation Function
 
@@ -290,10 +286,8 @@ tokenizer.save_vocabulary(output_vocab_file)
    - Điều chỉnh số neurons trong pre_classifier layer
    - Thêm batch normalization nếu cần
 
-[THÊM ẢNH: Biểu đồ so sánh hiệu suất với các cấu hình khác nhau]
 
 ## Kết luận
 
-Fine-tuning DistilBERT cho bài toán phân loại văn bản đa lớp là một quy trình có thể được thực hiện hiệu quả với PyTorch và Hugging Face Transformers. Mô hình đạt được độ chính xác cao trên tập validation và có thể được sử dụng cho nhiều ứng dụng thực tế.
-
-Code đầy đủ và dataset có thể được tìm thấy tại GitHub repository của project. Hãy thử nghiệm và chia sẻ kết quả của bạn với cộng đồng!
+Fine-tuning DistilBERT cho bài toán phân loại văn bản đa lớp là một quy trình có thể được thực hiện hiệu quả với PyTorch và Hugging Face Transformers. 
+Mô hình đạt được độ chính xác cao trên tập validation và có thể được sử dụng cho nhiều ứng dụng thực tế.
