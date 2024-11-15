@@ -1,8 +1,14 @@
-# Fine-tuning DistilBERT cho Phân loại Văn bản Đa lớp: Hướng dẫn Chi tiết
+# Fine-tuning DistilBERT cho Phân loại Văn bản Đa lớp
 
 ## 1. Giới thiệu
 
-Trong bài viết này, chúng ta sẽ khám phá cách fine-tune mô hình DistilBERT cho bài toán phân loại văn bản đa lớp. Đây là một trong những bài toán phổ biến nhất trong lĩnh vực xử lý ngôn ngữ tự nhiên, nơi một đoạn văn bản cần được phân loại vào một trong số các danh mục cho trước.
+Bài viết này sẽ hướng dẫn cách fine-tune mô hình DistilBERT cho bài toán phân loại văn bản đa lớp.
+Đây là một trong những bài toán phổ biến nhất trong lĩnh vực xử lý ngôn ngữ tự nhiên, nơi một đoạn văn bản cần được phân loại vào một trong số các danh mục cho trước.
+Lý do chọn mô hình DistilBERT:
+- **Nhanh nhất**
+- **Yêu cầu tài nguyên thấp nhất**
+- **Dễ triển khai**
+- **Chi phí thấp**
 
 ### 1.1 Dataset và Công cụ
 
