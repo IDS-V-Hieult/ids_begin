@@ -5,6 +5,7 @@
 Bài viết này sẽ hướng dẫn cách fine-tune mô hình DistilBERT cho bài toán phân loại văn bản đa lớp.
 Có thể áp dụng vào dự án JiJi như sau:
 - **Phân loại môn thi đấu --> Trích xuất dữ liệu --> Xuất ra dữ liệu dạng structure mong muốn**
+
 Lý do chọn mô hình DistilBERT:
 - **Nhanh nhất**
 - **Yêu cầu tài nguyên thấp nhất**
