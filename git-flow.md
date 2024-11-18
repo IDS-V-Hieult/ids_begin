@@ -45,28 +45,38 @@ Sau khi review code OK, thì tiến hành merge vào "main" trên giao diện gi
 ■Giải thích về lệnh
 - **git pull origin blog_writting**
 
-##git pull: Kéo (tải về) và cập nhật code từ kho lưu trữ từ xa (remote repository) về máy tính của bạn
-##origin: Tên mặc định của kho lưu trữ từ xa, thường là repository gốc trên GitHub/GitLab/Bitbucket
-##blog_writting: Tên nhánh (branch) mà bạn muốn kéo về
+git pull: Kéo (tải về) và cập nhật code từ kho lưu trữ từ xa (remote repository) về máy tính của bạn
+
+origin: Tên mặc định của kho lưu trữ từ xa, thường là repository gốc trên GitHub/GitLab/Bitbucket
+
+blog_writting: Tên nhánh (branch) mà bạn muốn kéo về
 
 Nói cách khác, lệnh này sẽ:
 
-##Kết nối đến repository từ xa có tên là "origin"
-##Tìm nhánh có tên "blog_writting" trên repository đó
-##Tải về tất cả các thay đổi mới từ nhánh "blog_writting"
-##Tự động merge (hợp nhất) những thay đổi đó vào nhánh hiện tại trên máy tính của bạn
+Kết nối đến repository từ xa có tên là "origin"
+
+Tìm nhánh có tên "blog_writting" trên repository đó
+
+Tải về tất cả các thay đổi mới từ nhánh "blog_writting"
+
+Tự động merge (hợp nhất) những thay đổi đó vào nhánh hiện tại trên máy tính của bạn
 
 
 ■Giải thích về lệnh
 - **git push origin blog_writting**
 
-##git push: Đẩy (tải lên) code từ máy tính của bạn lên kho lưu trữ từ xa (remote repository)
-##origin: Tên mặc định của kho lưu trữ từ xa, thường là repository gốc trên GitHub/GitLab/Bitbucket
-##blog_writting: Tên nhánh (branch) mà bạn muốn đẩy lên
+git push: Đẩy (tải lên) code từ máy tính của bạn lên kho lưu trữ từ xa (remote repository)
+
+origin: Tên mặc định của kho lưu trữ từ xa, thường là repository gốc trên GitHub/GitLab/Bitbucket
+
+blog_writting: Tên nhánh (branch) mà bạn muốn đẩy lên
 
 Nói cách khác, lệnh này sẽ:
 
-#Kết nối đến repository từ xa có tên là "origin"
-#Tìm nhánh có tên "blog_writting" trên repository đó
-#Tải lên tất cả các thay đổi từ nhánh "blog_writting" trên máy tính của bạn lên repository từ xa
-#Cập nhật nhánh "blog_writting" trên repository từ xa với những thay đổi mới nhất
+Kết nối đến repository từ xa có tên là "origin"
+
+Tìm nhánh có tên "blog_writting" trên repository đó
+
+Tải lên tất cả các thay đổi từ nhánh "blog_writting" trên máy tính của bạn lên repository từ xa
+
+Cập nhật nhánh "blog_writting" trên repository từ xa với những thay đổi mới nhất
