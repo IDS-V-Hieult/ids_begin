@@ -32,8 +32,6 @@ git checkout blog_writting
 ■Rebase với main để có code mới nhất và tránh conflict
 git rebase main
 
-=======
->>>>>>> 24c3187 (add git flow)
 ■Push code lên remote repository:
 git push origin blog_writting
 
