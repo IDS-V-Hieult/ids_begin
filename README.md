@@ -3,7 +3,8 @@
 ## 1. Giới thiệu
 
 Bài viết này sẽ hướng dẫn cách fine-tune mô hình DistilBERT cho bài toán phân loại văn bản đa lớp.
-Đây là một trong những bài toán phổ biến nhất trong lĩnh vực xử lý ngôn ngữ tự nhiên, nơi một đoạn văn bản cần được phân loại vào một trong số các danh mục cho trước.
+Có thể áp dụng vào dự án JiJi như sau:
+Phân loại môn thi đấu --> Trích xuất dữ liệu --> Xuất ra dữ liệu dạng structure mong muốn
 Lý do chọn mô hình DistilBERT:
 - **Nhanh nhất**
 - **Yêu cầu tài nguyên thấp nhất**
@@ -182,6 +183,17 @@ optimizer = torch.optim.Adam(params=model.parameters(), lr=LEARNING_RATE)
 ## 5. Training Process
 
 ### 5.1 Training Function
+Đoạn code này để tải và chuẩn bị dữ liệu và các tập dữ liệu, tạo mô hình và xác định loss function và optimizer.
+Định nghĩa một hàm training để huấn luyện mô hình trên tập dữ liệu training đã tạo ở trên, với số lần lặp được chỉ định (EPOCH).
+Một epoch xác định số lần toàn bộ dữ liệu sẽ được truyền qua mạng neural.
+Các sự kiện sau đây diễn ra trong hàm này để tinh chỉnh mạng neural:
+#### Dataloader truyền dữ liệu vào mô hình dựa trên kích thước batch (batch size).
+#### Output từ mô hình và category thực tế được so sánh để tính toán loss.
+#### Giá trị loss được sử dụng để tối ưu hóa trọng số của các neuron trong mạng.
+#### Sau mỗi 5000 bước, giá trị loss được in ra trong console.
+
+Ví dụ mô hình đã hoạt động với loss rất nhỏ là 0.0002485,
+nghĩa là output đã cực kỳ gần với output thực tế.
 
 ```python
 def calcuate_accu(big_idx, targets):
@@ -228,6 +240,12 @@ def train(epoch):
 
 
 ### 5.2 Validation Function
+Trong giai đoạn validation (kiểm định), chúng ta truyền dữ liệu chưa từng thấy (Tập dữ liệu Testing) vào mô hình.
+Bước này xác định mức độ hiệu quả của mô hình trên dữ liệu chưa từng thấy.
+Dữ liệu chưa từng thấy này là 20% của tập newscorpora.csv đã được tách ra trong giai đoạn tạo Dataset.
+Trong giai đoạn validation, trọng số của mô hình không được cập nhật.
+Chỉ có output cuối cùng được so sánh với giá trị thực tế. 
+Sự so sánh này sau đó được sử dụng để tính toán độ chính xác của mô hình.
 
 ```python
 def valid(model, testing_loader):
