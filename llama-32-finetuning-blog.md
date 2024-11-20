@@ -138,38 +138,49 @@ trainer = train_on_responses_only(
 
 ```python
 # Enable fast inference
-FastLanguageModel.for_inference(model)
+from unsloth.chat_templates import get_chat_template
+
+tokenizer = get_chat_template(
+    tokenizer,
+    chat_template = "llama-3.1",
+)
+FastLanguageModel.for_inference(model) # Enable native 2x faster inference
 
 messages = [
-    {"role": "user", "content": "Your question here"},
+    {"role": "user", "content": "Continue the fibonnaci sequence: 1, 1, 2, 3, 5, 8,"},
 ]
 inputs = tokenizer.apply_chat_template(
     messages,
     tokenize = True,
-    add_generation_prompt = True,
+    add_generation_prompt = True, # Must add for generation
     return_tensors = "pt",
 ).to("cuda")
 
-# Regular inference
-outputs = model.generate(
-    input_ids = inputs, 
-    max_new_tokens = 64,
-    use_cache = True,
-    temperature = 1.5,
-    min_p = 0.1
-)
+outputs = model.generate(input_ids = inputs, max_new_tokens = 64, use_cache = True,
+                         temperature = 1.5, min_p = 0.1)
+tokenizer.batch_decode(outputs)
+```
 
-# Streaming inference
+```python
+
+#Bạn cũng có thể sử dụng TextStreamer để suy luận liên tục - nhờ đó bạn có thể xem mã thông báo tạo theo mã thông báo, thay vì phải chờ đợi suốt thời gian qua!
+
+FastLanguageModel.for_inference(model) # Enable native 2x faster inference
+
+messages = [
+    {"role": "user", "content": "Continue the fibonnaci sequence: 1, 1, 2, 3, 5, 8,"},
+]
+inputs = tokenizer.apply_chat_template(
+    messages,
+    tokenize = True,
+    add_generation_prompt = True, # Must add for generation
+    return_tensors = "pt",
+).to("cuda")
+
 from transformers import TextStreamer
 text_streamer = TextStreamer(tokenizer, skip_prompt = True)
-outputs = model.generate(
-    input_ids = inputs,
-    streamer = text_streamer,
-    max_new_tokens = 128,
-    use_cache = True,
-    temperature = 1.5,
-    min_p = 0.1
-)
+_ = model.generate(input_ids = inputs, streamer = text_streamer, max_new_tokens = 128,
+                   use_cache = True, temperature = 1.5, min_p = 0.1)
 ```
 
 ## 7. Lưu và Tải Model
@@ -178,13 +189,54 @@ outputs = model.generate(
 
 ```python
 # Lưu locally
-model.save_pretrained("lora_model")
+model.save_pretrained("lora_model") # Local saving
 tokenizer.save_pretrained("lora_model")
-
-# Lưu lên Hugging Face Hub
-model.push_to_hub("your_name/lora_model", token="your-token")
-tokenizer.push_to_hub("your_name/lora_model", token="your-token")
 ```
+
+```python
+#Bây giờ nếu bạn muốn tải bộ điều hợp LoRA mà chúng tôi vừa lưu để suy luận, hãy đặt False thành True:
+if False:
+    from unsloth import FastLanguageModel
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name = "lora_model", # YOUR MODEL YOU USED FOR TRAINING
+        max_seq_length = max_seq_length,
+        dtype = dtype,
+        load_in_4bit = load_in_4bit,
+    )
+    FastLanguageModel.for_inference(model) # Enable native 2x faster inference
+
+messages = [
+    {"role": "user", "content": "Describe a tall tower in the capital of France."},
+]
+inputs = tokenizer.apply_chat_template(
+    messages,
+    tokenize = True,
+    add_generation_prompt = True, # Must add for generation
+    return_tensors = "pt",
+).to("cuda")
+
+from transformers import TextStreamer
+text_streamer = TextStreamer(tokenizer, skip_prompt = True)
+_ = model.generate(input_ids = inputs, streamer = text_streamer, max_new_tokens = 128,
+                   use_cache = True, temperature = 1.5, min_p = 0.1)
+```
+
+```python
+# Lưu lên Hugging Face Hub
+#Saving to float16 for VLLM
+# Merge to 16bit
+if False: model.save_pretrained_merged("model", tokenizer, save_method = "merged_16bit",)
+if False: model.push_to_hub_merged("hf/model", tokenizer, save_method = "merged_16bit", token = "")
+
+# Merge to 4bit
+if False: model.save_pretrained_merged("model", tokenizer, save_method = "merged_4bit",)
+if False: model.push_to_hub_merged("hf/model", tokenizer, save_method = "merged_4bit", token = "")
+
+# Just LoRA adapters
+if True: model.save_pretrained_merged("lora_model", tokenizer, save_method = "lora",)
+if True: model.push_to_hub_merged("lethehieu/lora_model", tokenizer, save_method = "lora", token = "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")
+```
+
 
 ### 7.2 Chuyển đổi sang GGUF Format
 
