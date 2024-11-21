@@ -242,21 +242,21 @@ if True: model.push_to_hub_merged("lethehieu/lora_model", tokenizer, save_method
 
 ```python
 # Save to 8bit Q8_0
-if False: model.save_pretrained_gguf("lora_model", tokenizer,)
+if True: model.save_pretrained_gguf("lora_model", tokenizer,)
 # Remember to go to https://huggingface.co/settings/tokens for a token!
 # And change with your username and model!
-if False: model.push_to_hub_gguf("lethehieu/lora_model", tokenizer, token = "")
+if True: model.push_to_hub_gguf("lethehieu/lora_model", tokenizer, token = "")
 
 # Save to 16bit GGUF
-if False: model.save_pretrained_gguf("lora_model", tokenizer, quantization_method = "f16")
-if False: model.push_to_hub_gguf("lethehieu/lora_model", tokenizer, quantization_method = "f16", token = "")
+if True: model.save_pretrained_gguf("lora_model", tokenizer, quantization_method = "f16")
+if True: model.push_to_hub_gguf("lethehieu/lora_model", tokenizer, quantization_method = "f16", token = "")
 
 # Save to q4_k_m GGUF
-if False: model.save_pretrained_gguf("lora_model", tokenizer, quantization_method = "q4_k_m")
-if False: model.push_to_hub_gguf("lethehieu/lora_model", tokenizer, quantization_method = "q4_k_m", token = "")
+if True: model.save_pretrained_gguf("lora_model", tokenizer, quantization_method = "q4_k_m")
+if True: model.push_to_hub_gguf("lethehieu/lora_model", tokenizer, quantization_method = "q4_k_m", token = "")
 
 # Save to multiple GGUF options - much faster if you want multiple!
-if False:
+if True:
     model.push_to_hub_gguf(
         "lethehieu/lora_model", # Change with your username!
         tokenizer,
