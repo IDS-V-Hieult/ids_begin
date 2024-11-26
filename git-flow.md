@@ -91,4 +91,8 @@ git add <conflict_files>
 # 3. Tiếp tục rebase
 git rebase --continue
 
+# 4. Nếu muốn hủy rebase
+git rebase --abort
+
+
 # Tạo Pull Request từ "blog_writting" --> "main" sau đó merge vào "main" bằng tool trên Github
