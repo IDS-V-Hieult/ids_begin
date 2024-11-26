@@ -96,3 +96,5 @@ git rebase --abort
 
 
 # Tạo Pull Request từ "blog_writting" --> "main" sau đó merge vào "main" bằng tool trên Github
+
+# main
