@@ -81,3 +81,14 @@ Tải lên tất cả các thay đổi từ nhánh "blog_writting" trên máy t�
 
 
 ■Khi muốn merge nội dung cập nhật từ nhánh "blog_writting" vào nhánh "main"
+# Rebase với main
+git rebase origin/main
+
+# Nếu có conflict:
+# 1. Giải quyết từng file conflict
+# 2. Add các file đã resolve
+git add <conflict_files>
+# 3. Tiếp tục rebase
+git rebase --continue
+
+# Tạo Pull Request từ "blog_writting" --> "main" sau đó merge vào "main" bằng tool trên Github
