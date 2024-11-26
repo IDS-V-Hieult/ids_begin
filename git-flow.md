@@ -87,7 +87,7 @@ git rebase origin/main
 # Nếu có conflict:
 # 1. Giải quyết từng file conflict
 # 2. Add và commit các file đã resolve
-git add -am "message hợp lý"
+git commit -am "message hợp lý"
 # 3. Tiếp tục rebase
 git rebase --continue
 
