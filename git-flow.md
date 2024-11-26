@@ -79,7 +79,5 @@ Tìm nhánh có tên "blog_writting" trên repository đó
 
 Tải lên tất cả các thay đổi từ nhánh "blog_writting" trên máy tính của bạn lên repository từ xa
 
-Cập nhật nhánh "blog_writting" trên repository từ xa với những thay đổi mới nhất
-
 
 ■Khi muốn merge nội dung cập nhật từ nhánh "blog_writting" vào nhánh "main"
