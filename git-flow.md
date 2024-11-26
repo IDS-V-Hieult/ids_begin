@@ -105,7 +105,7 @@ git push origin blog_writting
 
 ■So sánh git merge và git rebase
 # Git Merge - "Giữ nguyên lịch sử"
-
+```python
 A---B---C (main)
      \
       D---E (feature)
@@ -113,22 +113,30 @@ A---B---C (main)
         \     \
          \     \
           ------M (sau khi merge)
-
+```
 Đặc điểm:
 
 Tạo ra một commit mới (M) gọi là "merge commit"
+
 Giữ lại toàn bộ lịch sử của cả 2 nhánh
+
 Có thể thấy rõ code đến từ nhánh nào
+
 Lịch sử commit hiển thị dạng "song song" với các nhánh rẽ
 
 # Git Rebase - "Viết lại lịch sử"
+```python
 A---B---C (main)
          \
           D'---E' (feature sau khi rebase)
+```
 
 Đặc điểm:
 
 Di chuyển toàn bộ các commit từ nhánh feature (D, E) lên đầu nhánh main
+
 Tạo ra các commit mới (D', E') có nội dung giống commit cũ nhưng có hash mới
+
 Lịch sử trở thành một đường thẳng, không còn thấy được điểm rẽ nhánh ban đầu
+
 Trông như thể các commit của feature được viết tiếp theo main một cách tuần tự
