@@ -81,7 +81,7 @@ Tải lên tất cả các thay đổi từ nhánh "blog_writting" trên máy t�
 
 
 ■Khi muốn merge nội dung cập nhật từ nhánh "blog_writting" vào nhánh "main"
-# Rebase với main
+# Rebase với main để có nội dung mới nhất từ "main"
 git rebase origin/main
 
 # Nếu có conflict:
