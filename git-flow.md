@@ -86,13 +86,17 @@ git rebase origin/main
 
 # Nếu có conflict:
 # 1. Giải quyết từng file conflict
-# 2. Add các file đã resolve
-git add <conflict_files>
+# 2. Add và commit các file đã resolve
+git add -am "message hợp lý"
 # 3. Tiếp tục rebase
 git rebase --continue
 
 # 4. Nếu muốn hủy rebase
 git rebase --abort
+
+
+# 5. Sau đó push lại nội dung vào nhánh "blog_writting" trên remote
+git push origin blog_writting
 
 
 # Tạo Pull Request từ "blog_writting" --> "main" sau đó merge vào "main" bằng tool trên Github
