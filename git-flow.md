@@ -140,4 +140,4 @@ Lịch sử trở thành một đường thẳng, không còn thấy được đ
 
 Trông như thể các commit của feature được viết tiếp theo main một cách tuần tự
 
-#main
+#main blog_writting
