@@ -101,7 +101,6 @@ git push origin blog_writting
 
 # Tạo Pull Request từ "blog_writting" --> "main" sau đó merge vào "main" bằng tool trên Github
 
-# conflict nha em haha1 haha2
 
 ■So sánh git merge và git rebase
 # Git Merge - "Giữ nguyên lịch sử"
