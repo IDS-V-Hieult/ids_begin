@@ -139,3 +139,5 @@ Tạo ra các commit mới (D', E') có nội dung giống commit cũ nhưng có
 Lịch sử trở thành một đường thẳng, không còn thấy được điểm rẽ nhánh ban đầu
 
 Trông như thể các commit của feature được viết tiếp theo main một cách tuần tự
+
+#main blog_writting
