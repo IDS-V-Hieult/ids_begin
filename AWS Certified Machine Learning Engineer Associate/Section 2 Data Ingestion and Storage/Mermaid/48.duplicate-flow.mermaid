@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant P as Producer
+    participant K as Kinesis
+    participant C as Consumer
+    
+    Note over P,K: Producer Duplicates Scenario
+    P->>+K: PutRecord(data, seq=123)
+    K-->>-P: Network Timeout
+    Note over P: Assumes record not written
+    P->>+K: PutRecord(same data, seq=124)
+    K-->>-P: Acknowledgment
+    Note over K: Two identical records<br/>with different sequences
+
+    Note over K,C: Consumer Duplicates Scenario
+    rect rgb(240, 240, 240)
+        Note over C: Worker terminates
+        C->>+K: GetRecords()
+        K-->>-C: Records[1,2,3]
+        Note over C: Process Records[1,2]
+        Note over C: Restart
+        C->>+K: GetRecords()
+        K-->>-C: Records[1,2,3]
+        Note over C: Process Records[1,2] again
+    end
