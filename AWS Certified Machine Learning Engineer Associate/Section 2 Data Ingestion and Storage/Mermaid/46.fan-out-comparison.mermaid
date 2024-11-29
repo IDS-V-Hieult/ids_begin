@@ -1,0 +1,26 @@
+flowchart TB
+    subgraph "Standard Consumers"
+        P1[Producer] --> S1[Shard<br/>2MB/s total]
+        S1 --> |Pull 0.4MB/s| C1[Consumer 1]
+        S1 --> |Pull 0.4MB/s| C2[Consumer 2]
+        S1 --> |Pull 0.4MB/s| C3[Consumer 3]
+        S1 --> |Pull 0.4MB/s| C4[Consumer 4]
+        S1 --> |Pull 0.4MB/s| C5[Consumer 5]
+    end
+
+    subgraph "Enhanced Fan-Out"
+        P2[Producer] --> S2[Shard]
+        S2 --> |Push 2MB/s| EC1[Consumer 1]
+        S2 --> |Push 2MB/s| EC2[Consumer 2]
+        S2 --> |Push 2MB/s| EC3[Consumer 3]
+        S2 --> |Push 2MB/s| EC4[Consumer 4]
+        S2 --> |Push 2MB/s| EC5[Consumer 5]
+    end
+
+    style S1 fill:#f96,stroke:#333
+    style S2 fill:#f96,stroke:#333
+    style EC1 fill:#9f9,stroke:#333
+    style EC2 fill:#9f9,stroke:#333
+    style EC3 fill:#9f9,stroke:#333
+    style EC4 fill:#9f9,stroke:#333
+    style EC5 fill:#9f9,stroke:#333

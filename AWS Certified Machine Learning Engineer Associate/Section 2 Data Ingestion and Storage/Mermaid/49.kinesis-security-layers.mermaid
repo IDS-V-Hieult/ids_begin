@@ -1,0 +1,38 @@
+flowchart TB
+    subgraph "Access Control"
+        IAM[IAM Policies]
+    end
+
+    subgraph "Data Security"
+        HTTPS[HTTPS Endpoints]
+        KMS[KMS Encryption]
+        CLIENT[Client-side Encryption]
+    end
+
+    subgraph "Network Security"
+        VPC[VPC Endpoints]
+        SG[Security Groups]
+    end
+
+    Producer[Producer Application]
+    Kinesis[Kinesis Data Streams]
+    Consumer[Consumer Application]
+
+    Producer --> |IAM Auth| IAM
+    Producer --> |HTTPS| HTTPS
+    Producer --> |Optional| CLIENT
+    Producer --> |Private| VPC
+
+    IAM --> Kinesis
+    HTTPS --> Kinesis
+    CLIENT --> Kinesis
+    VPC --> Kinesis
+    
+    Kinesis --> |Encrypted| KMS
+    
+    style IAM fill:#f96,stroke:#333
+    style HTTPS fill:#9cf,stroke:#333
+    style KMS fill:#9cf,stroke:#333
+    style CLIENT fill:#9cf,stroke:#333
+    style VPC fill:#9f9,stroke:#333
+    style SG fill:#9f9,stroke:#333

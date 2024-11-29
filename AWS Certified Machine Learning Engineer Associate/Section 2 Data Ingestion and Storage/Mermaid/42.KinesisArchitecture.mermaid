@@ -1,0 +1,50 @@
+flowchart LR
+    subgraph Producers
+        A[Applications]
+        B[Desktop/Mobile]
+        C[AWS SDK]
+        D[KPL]
+        E[Kinesis Agent]
+    end
+
+    subgraph "Kinesis Data Stream"
+        subgraph Shards
+            S1[Shard 1]
+            S2[Shard 2]
+            S3[Shard N]
+        end
+    end
+
+    subgraph Consumers
+        L[Lambda]
+        F[Firehose]
+        AN[Analytics]
+        AP[Applications]
+    end
+
+    A --> Shards
+    B --> Shards
+    C --> Shards
+    D --> Shards
+    E --> Shards
+
+    Shards --> L
+    Shards --> F
+    Shards --> AN
+    Shards --> AP
+
+    subgraph "Capacity Modes"
+        CM1[Provisioned Mode]
+        CM2[On-demand Mode]
+    end
+
+    subgraph "Security"
+        SEC1[IAM]
+        SEC2[KMS]
+        SEC3[VPC Endpoint]
+        SEC4[CloudTrail]
+    end
+
+    style Shards fill:#f96,stroke:#333
+    style Producers fill:#9cf,stroke:#333
+    style Consumers fill:#9f9,stroke:#333

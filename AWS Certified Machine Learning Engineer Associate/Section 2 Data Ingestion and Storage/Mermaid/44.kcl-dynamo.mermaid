@@ -1,0 +1,34 @@
+flowchart TB
+    subgraph "Kinesis Data Stream"
+        S1[Shard 1]
+        S2[Shard 2]
+        S3[Shard 3]
+        S4[Shard 4]
+    end
+
+    subgraph "KCL Applications"
+        direction TB
+        subgraph "EC2 Instance 1"
+            APP1[KCL App 1]
+        end
+        subgraph "EC2 Instance 2"
+            APP2[KCL App 2]
+        end
+    end
+
+    subgraph "DynamoDB Table"
+        D1[Checkpoint Data<br/>Shard Leases]
+    end
+
+    S1 & S2 --> APP1
+    S3 & S4 --> APP2
+    APP1 --> D1
+    APP2 --> D1
+
+    style S1 fill:#f96,stroke:#333
+    style S2 fill:#f96,stroke:#333
+    style S3 fill:#f96,stroke:#333
+    style S4 fill:#f96,stroke:#333
+    style APP1 fill:#9cf,stroke:#333
+    style APP2 fill:#9cf,stroke:#333
+    style D1 fill:#ff9,stroke:#333
