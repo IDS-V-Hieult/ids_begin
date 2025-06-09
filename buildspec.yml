@@ -14,7 +14,7 @@ phases:
       - echo Build phase started on `date`
       - echo Building application...
       # Thêm lệnh build của bạn ở đây (npm install, npm run build, etc.)
-      # Nếu NextJS thì dùng các lệnh tương ứng
+      # Nếu NextJS thì dùng các lệnh tương ứng lần 1
       
   post_build:
     commands:
