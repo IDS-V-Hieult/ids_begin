@@ -346,3 +346,160 @@ class ConverseSqlAgentStack(Stack):
         # Grant permissions
         dynamodb_table.grant_read_write_data(lambda_function)
         db_secret.grant_read(lambda_function)
+
+        # Create EC2 Key Pair
+        # IMPORTANT: After CDK creates this key pair, you cannot retrieve the private key programmatically
+        # You have two options:
+        # 1. Delete this key pair creation and use an existing key pair by setting key_name directly
+        # 2. After deployment, go to EC2 Console, delete and recreate the key pair with the same name to download it
+        key_pair = ec2.CfnKeyPair(
+            self, "SQLAgentEC2KeyPair",
+            key_name="sqlagent-ec2-key"
+        )
+
+        # Create IAM role for EC2
+        ec2_role = iam.Role(
+            self, "SQLAgentEC2Role",
+            role_name="sqlagent-ec2-role",
+            assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"),
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonSSMManagedInstanceCore")
+            ]
+        )
+
+        # Grant EC2 role permission to read the RDS secret
+        db_secret.grant_read(ec2_role)
+        
+        # Add policy to list secrets (for the helper script)
+        ec2_role.add_to_policy(iam.PolicyStatement(
+            actions=["secretsmanager:ListSecrets"],
+            resources=["*"]
+        ))
+
+        # Create Security Group for EC2
+        ec2_security_group = ec2.SecurityGroup(
+            self, "SQLAgentEC2SecurityGroup",
+            vpc=vpc,
+            security_group_name="sqlagent-ec2-sg",
+            description="Security group for SQLAgent EC2 instance",
+            allow_all_outbound=True  # This handles the outbound all traffic rule
+        )
+
+        # Add inbound SSH rule
+        ec2_security_group.add_ingress_rule(
+            peer=ec2.Peer.ipv4("0.0.0.0/0"),
+            connection=ec2.Port.tcp(22),
+            description="Allow SSH from anywhere"
+        )
+
+        # Allow EC2 to connect to RDS PostgreSQL
+        db_security_group.add_ingress_rule(
+            peer=ec2_security_group,
+            connection=ec2.Port.tcp(5432),
+            description="Allow EC2 to connect to PostgreSQL"
+        )
+
+        # Create EC2 instance
+        ec2_instance = ec2.Instance(
+            self, "SQLAgentEC2",
+            instance_name="sqlagent-ec2",
+            instance_type=ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MEDIUM),
+            machine_image=ec2.MachineImage.latest_amazon_linux2023(),
+            vpc=vpc,
+            vpc_subnets=ec2.SubnetSelection(subnets=[public_subnet_01]),
+            security_group=ec2_security_group,
+            key_name=key_pair.key_name,
+            role=ec2_role,
+            block_devices=[
+                ec2.BlockDevice(
+                    device_name="/dev/xvda",
+                    volume=ec2.BlockDeviceVolume.ebs(
+                        volume_size=8,
+                        volume_type=ec2.EbsDeviceVolumeType.GP3,
+                        encrypted=True,
+                        delete_on_termination=True
+                    )
+                )
+            ],
+            user_data=ec2.UserData.custom(f"""#!/bin/bash
+# Update the system
+yum update -y
+
+# Install PostgreSQL 17 client
+dnf install postgresql17 -y
+
+# Install jq for JSON parsing
+yum install jq -y
+
+# Install AWS CLI v2 (should already be installed on AL2023)
+# aws --version
+
+# Install Session Manager plugin
+cd /tmp
+curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
+yum install -y session-manager-plugin.rpm
+
+# Create helpful script for database connection
+cat > /home/ec2-user/connect-to-rds.sh << 'EOF'
+#!/bin/bash
+echo "Getting RDS password from Secrets Manager..."
+SECRET_ARN=$(aws secretsmanager list-secrets --query "SecretList[?contains(Name,'DBSecret')].ARN" --output text --region {self.region})
+PASSWORD=$(aws secretsmanager get-secret-value --secret-id $SECRET_ARN --query SecretString --output text --region {self.region} | jq -r .password)
+echo "Use this password when prompted: $PASSWORD"
+echo ""
+echo "To connect to RDS, use:"
+echo "psql -h <RDS_ENDPOINT> -U SQLAgentDBAdmin -d sqlagentdb -p 5432"
+EOF
+
+chmod +x /home/ec2-user/connect-to-rds.sh
+chown ec2-user:ec2-user /home/ec2-user/connect-to-rds.sh
+
+echo "EC2 instance setup complete!" > /tmp/setup-complete.log
+""")
+        )
+        cdk.Tags.of(ec2_instance).add("Name", "sqlagent-ec2")
+
+        # Create and associate Elastic IP
+        eip = ec2.CfnEIP(
+            self, "SQLAgentEIP",
+            domain="vpc",
+            instance_id=ec2_instance.instance_id
+        )
+        cdk.Tags.of(eip).add("Name", "sqlagent-ec2-eip")
+
+        # Output the instance details
+        cdk.CfnOutput(
+            self, "EC2InstanceId",
+            value=ec2_instance.instance_id,
+            description="EC2 Instance ID"
+        )
+
+        cdk.CfnOutput(
+            self, "EC2PublicIP",
+            value=eip.attr_public_ip,
+            description="EC2 Public IP Address"
+        )
+
+        cdk.CfnOutput(
+            self, "EC2KeyPairName",
+            value=key_pair.key_name,
+            description="EC2 Key Pair Name"
+        )
+
+        cdk.CfnOutput(
+            self, "RDSEndpoint",
+            value=db_instance.db_instance_endpoint_address,
+            description="RDS PostgreSQL Endpoint"
+        )
+
+        cdk.CfnOutput(
+            self, "RDSPort",
+            value=db_instance.db_instance_endpoint_port,
+            description="RDS PostgreSQL Port"
+        )
+
+        cdk.CfnOutput(
+            self, "RDSSecretArn",
+            value=db_secret.secret_arn,
+            description="RDS Password Secret ARN"
+        )

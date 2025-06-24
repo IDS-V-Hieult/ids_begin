@@ -81,13 +81,68 @@ pip install -r requirements.txt
 cdk deploy
 ```
 
+**Important**: After deployment completes:
+- Note down all the outputs (EC2 instance ID, Elastic IP, RDS endpoint, etc.)
+- For SSH access to EC2: The key pair "sqlagent-ec2-key" is created by CDK but the private key is not downloadable
+  - Option 1: Delete and recreate the key pair in EC2 Console with the same name to get the private key
+  - Option 2: Use Session Manager to connect without a key pair
+  - Option 3: Modify the CDK code to use an existing key pair before deployment
+
 ### To dispose of the stack afterwards:
 
 ```
 cdk destroy
 ```
 
-7. Once the resources are built. Connect to the PostgreSQL RDS instance and run your database schema.
+7. Once the resources are built, connect to the PostgreSQL RDS instance and run your database schema.
+
+**Note**: The EC2 instance can be accessed via Session Manager (recommended) or SSH. For SSH access, see the connection instructions above.
+
+### Connecting to EC2 Instance
+
+**Option 1: Using SSH (requires key pair)**
+If you need SSH access, you'll need to handle the key pair:
+- The CDK creates a key pair but doesn't provide the private key
+- Go to EC2 Console → Key Pairs, delete "sqlagent-ec2-key", and recreate it to download the private key
+- Then connect:
+```
+chmod 400 sqlagent-ec2-key.pem
+ssh -i sqlagent-ec2-key.pem ec2-user@<ELASTIC_IP>
+```
+
+**Option 2: Using AWS Systems Manager Session Manager (recommended)**
+No key pair needed:
+```
+aws ssm start-session --target <INSTANCE_ID>
+```
+
+**Option 3: Use an existing key pair**
+Before deployment, modify the CDK code to use your existing key pair instead of creating a new one.
+
+### Connecting to RDS from EC2
+
+Once connected to the EC2 instance, PostgreSQL client is pre-installed via user data script.
+
+1. A helper script is available to get the RDS password:
+```
+./connect-to-rds.sh
+```
+
+2. The RDS endpoint, port, and secret ARN will be shown in the CDK outputs after deployment.
+
+3. Alternatively, manually retrieve the database password from AWS Secrets Manager:
+```
+# Get the password (replace <SECRET_ARN> with the actual ARN from CDK outputs)
+aws secretsmanager get-secret-value --secret-id <SECRET_ARN> --query SecretString --output text | jq -r .password
+```
+
+4. Connect to the database from EC2:
+```
+psql -h <RDS_ENDPOINT> -U SQLAgentDBAdmin -d sqlagentdb -p 5432
+# Enter the password when prompted
+```
+
+### Installing PostgreSQL Client Locally
 
 Ensure that you have the psql client installed and that the RDS PostgreSQL instance security group allows inbound traffic on port 5432.
 
@@ -140,10 +195,10 @@ The solution creates a custom VPC with the following configuration:
 
 - **VPC**: SQLAgent-vpc (10.2.0.0/16)
 - **Subnets**:
-  - Public Subnet 1: SQLAgent-public01-subnet (10.2.1.0/24)
+  - Public Subnet 1: SQLAgent-public01-subnet (10.2.1.0/24) - Contains EC2 bastion host
   - Public Subnet 2: SQLAgent-public02-subnet (10.2.2.0/24)
-  - Private Subnet 1: SQLAgent-private01-subnet (10.2.3.0/24)
-  - Private Subnet 2: SQLAgent-private02-subnet (10.2.4.0/24)
+  - Private Subnet 1: SQLAgent-private01-subnet (10.2.3.0/24) - Contains Lambda and RDS
+  - Private Subnet 2: SQLAgent-private02-subnet (10.2.4.0/24) - Contains Lambda and RDS
 - **Route Tables**:
   - SQLAgent-rtb-public: Routes to Internet via SQLAgent-igw
   - SQLAgent-rtb-private01: Private route table for subnet 01 (no internet access)
@@ -168,6 +223,23 @@ The solution creates a custom VPC with the following configuration:
 - **Subnet Group**: sqlagent-db-subnet-group
 - **Security Group**: sqlagent-db-sg
 
+### EC2 Instance Configuration
+
+The EC2 instance serves as a bastion host for database administration and testing.
+
+- **Instance Name**: sqlagent-ec2
+- **AMI**: Amazon Linux 2023 (latest)
+- **Instance Type**: t3.medium
+- **Storage**: 8 GiB GP3 (encrypted)
+- **Key Pair**: sqlagent-ec2-key
+- **IAM Role**: sqlagent-ec2-role (with AmazonSSMManagedInstanceCore)
+- **VPC**: SQLAgent-vpc
+- **Subnet**: SQLAgent-public01-subnet
+- **Security Group**: sqlagent-ec2-sg
+  - Inbound: SSH (22) from 0.0.0.0/0
+  - Outbound: All traffic to 0.0.0.0/0
+- **Elastic IP**: Automatically allocated and associated
+
 ### Manual Installation steps
 
 **Important Note**: Since this architecture doesn't use NAT Gateways, Lambda functions in private subnets cannot access the internet directly. All AWS service calls must go through VPC endpoints.
@@ -189,17 +261,23 @@ The solution creates a custom VPC with the following configuration:
 	- DynamoDB (com.amazonaws..dynamodb)
 	- Secrets Manager (com.amazonaws..secretsmanager)
 
-4. Ensure the Lambda execution role has permissions for:
+6. Deploy an EC2 instance as a bastion host:
+   - Use Amazon Linux 2023 AMI
+   - Place in public subnet with Elastic IP
+   - Configure security group for SSH access
+   - Ensure it can connect to RDS in private subnet
+
+7. Ensure the Lambda execution role has permissions for:
 	- Bedrock Converse and the Claude 3 Sonnet
 	- DynamoDB table for use with the agent
 	- Secrets Manager key to store the RDS credentials
 
-5. Ensure Lambda has the following environment variables:
+8. Ensure Lambda has the following environment variables:
 	- DynamoDbMemoryTable (advtext2sql_memory_tb)
 	- BedrockModelId (anthropic.claude-3-sonnet-20240229-v1:0)
 
-6. Ensure that Lambda/VPC endpoints/RDS security groups allow communication
-7. Use the Lambda test function to test the setup.
+9. Ensure that Lambda/VPC endpoints/RDS security groups allow communication
+10. Use the Lambda test function to test the setup.
 
 ### Security Best Practices for Production
 
